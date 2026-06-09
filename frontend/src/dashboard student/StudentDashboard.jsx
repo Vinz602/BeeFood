@@ -603,18 +603,10 @@ const StudentDashboard = () => {
                   <div className="relative rounded-3xl overflow-hidden shadow-sm border border-orange-100 bg-white mt-2">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30" />
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-orange-200/30 to-amber-200/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-                    
-                    <div className="absolute right-0 top-0 bottom-0 pointer-events-none w-[55%] h-full hidden sm:block">
-                      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10 w-1/3" />
-                      <img 
-                        src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1000&auto=format&fit=crop&q=80" 
-                        alt="Healthy Food" 
-                        className="w-full h-full object-cover object-center"
-                      />
-                    </div>
 
-                    <div className="relative z-10 p-8 md:p-12 flex justify-between items-center">
-                      <div className="max-w-md">
+                    <div className="relative z-10 grid sm:grid-cols-2 items-stretch">
+                      <div className="p-8 md:p-12">
+                        <div className="max-w-md">
                         <div className="inline-flex items-center gap-2 bg-orange-100/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-200 shadow-sm mb-5">
                           <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
                           <span className="text-[10px] font-black uppercase tracking-widest text-orange-700">Pre-Order Cepat</span>
@@ -631,6 +623,16 @@ const StudentDashboard = () => {
                         <p className="text-gray-600 text-sm md:text-base font-medium mb-8 max-w-sm leading-relaxed">
                           Estimasi pengerjaan terpantau real-time. Hindari antrean panjang dan nikmati waktu istirahatmu.
                         </p>
+                        </div>
+                      </div>
+
+                      <div className="relative hidden sm:block min-h-[220px] md:min-h-[280px]">
+                        <img
+                          src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1000&auto=format&fit=crop&q=80"
+                          alt="Healthy Food"
+                          className="absolute inset-0 w-full h-full object-cover object-center"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/70 to-transparent" />
                       </div>
                     </div>
                   </div>
@@ -695,21 +697,19 @@ const StudentDashboard = () => {
                               <motion.div
                                 key={menu.id}
                                 whileHover={{ y: -2 }}
-                                className="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-4 flex items-center gap-4 relative"
+                                className="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all p-4 flex items-stretch gap-4"
                               >
-                                {/* Foto (Kiri) */}
-                                <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl relative overflow-hidden bg-gray-100 shrink-0">
+                                <div className="w-24 h-24 md:w-28 md:h-28 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
                                   <img
                                     src={menu.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60"}
                                     alt={menu.name}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover object-center"
                                   />
                                 </div>
 
-                                {/* Detail Info (Tengah/Kanan) */}
-                                <div className="flex-1 min-w-0 h-full flex flex-col justify-between py-1 pr-24">
+                                <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                                   <div>
-                                    <h4 className="font-black text-gray-900 text-base md:text-lg leading-tight truncate">{menu.name}</h4>
+                                    <h4 className="font-black text-gray-900 text-base md:text-lg leading-tight">{menu.name}</h4>
                                     <p className="text-[10px] text-orange-500 font-bold bg-orange-50 border border-orange-100/50 px-2 py-0.5 rounded-md inline-block mt-1">
                                       {menu.tenantName}
                                     </p>
@@ -718,44 +718,41 @@ const StudentDashboard = () => {
                                     </p>
                                   </div>
 
-                                  {/* Buttons Tambah / Qty */}
-                                  <div className="mt-3 w-32">
-                                    {!menu.isAvailable ? (
-                                      <div className="bg-red-500 text-white text-[10px] font-black py-1.5 rounded-xl text-center shadow-md">
-                                        Habis
-                                      </div>
-                                    ) : qty === 0 ? (
-                                      <button
-                                        onClick={() => handleSearchMenuQtyChange(menu, 1)}
-                                        className="w-full bg-white text-gray-900 hover:text-orange-600 border border-gray-100 text-xs font-black py-1.5 rounded-xl shadow-md transition-colors text-center cursor-pointer"
-                                      >
-                                        Tambah
-                                      </button>
-                                    ) : (
-                                      <div className="flex items-center justify-between bg-orange-500 text-white text-xs font-black py-1 px-1.5 rounded-xl shadow-md">
-                                        <button
-                                          onClick={() => handleSearchMenuQtyChange(menu, -1)}
-                                          className="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded-lg cursor-pointer"
-                                        >
-                                          -
-                                        </button>
-                                        <span>{qty}</span>
+                                  <div className="mt-3 flex items-center justify-between gap-3">
+                                    <p className="text-orange-600 font-black text-base md:text-lg shrink-0">
+                                      Rp {menu.price.toLocaleString("id-ID")}
+                                    </p>
+                                    <div className="w-32 shrink-0">
+                                      {!menu.isAvailable ? (
+                                        <div className="bg-red-500 text-white text-[10px] font-black py-1.5 rounded-xl text-center shadow-md">
+                                          Habis
+                                        </div>
+                                      ) : qty === 0 ? (
                                         <button
                                           onClick={() => handleSearchMenuQtyChange(menu, 1)}
-                                          className="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded-lg cursor-pointer"
+                                          className="w-full bg-white text-gray-900 hover:text-orange-600 border border-gray-100 text-xs font-black py-1.5 rounded-xl shadow-md transition-colors text-center cursor-pointer"
                                         >
-                                          +
+                                          Tambah
                                         </button>
-                                      </div>
-                                    )}
+                                      ) : (
+                                        <div className="flex items-center justify-between bg-orange-500 text-white text-xs font-black py-1 px-1.5 rounded-xl shadow-md">
+                                          <button
+                                            onClick={() => handleSearchMenuQtyChange(menu, -1)}
+                                            className="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded-lg cursor-pointer"
+                                          >
+                                            -
+                                          </button>
+                                          <span>{qty}</span>
+                                          <button
+                                            onClick={() => handleSearchMenuQtyChange(menu, 1)}
+                                            className="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded-lg cursor-pointer"
+                                          >
+                                            +
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-
-                                {/* Pojok Kanan Atas Harga */}
-                                <div className="absolute top-4 right-4 text-right">
-                                  <p className="text-orange-600 font-black text-base md:text-lg">
-                                    Rp {menu.price.toLocaleString("id-ID")}
-                                  </p>
                                 </div>
                               </motion.div>
                             );
@@ -777,8 +774,8 @@ const StudentDashboard = () => {
                             onClick={() => setSelectedTenant(tenant)}
                             className="bg-white rounded-3xl overflow-hidden border border-gray-100 hover:border-orange-200 shadow-sm hover:shadow-xl hover:shadow-orange-500/10 cursor-pointer transition-all flex flex-col group"
                           >
-                            <div className="h-40 w-full relative overflow-hidden bg-gray-100">
-                              <img src={tenant.image} alt={tenant.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            <div className="h-44 w-full relative overflow-hidden bg-gray-100">
+                              <img src={tenant.image} alt={tenant.name} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
                               <span className="absolute top-3 left-3 bg-orange-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg">
                                 Kantin Binus
@@ -825,7 +822,9 @@ const StudentDashboard = () => {
 
                   <div className="bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-6 relative overflow-hidden">
                     <div className="absolute right-0 top-0 w-32 h-32 bg-orange-50 rounded-bl-full -z-0 opacity-50" />
-                    <img src={selectedTenant.image} alt={selectedTenant.name} className="w-24 h-24 md:w-32 md:h-32 object-cover rounded-2xl shadow-md z-10" />
+                    <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl overflow-hidden bg-gray-100 shrink-0 shadow-md z-10">
+                      <img src={selectedTenant.image} alt={selectedTenant.name} className="w-full h-full object-cover object-center" />
+                    </div>
                     <div className="space-y-2 z-10">
                       <span className="inline-block bg-orange-50 text-orange-600 border border-orange-100 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
                         TENANT AKTIF
@@ -851,35 +850,38 @@ const StudentDashboard = () => {
                       {selectedTenant.menus
                         .filter(menu => menu.name.toLowerCase().includes(searchQuery.toLowerCase()))
                         .map((menu) => (
-                          <div key={menu.id} className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex justify-between gap-4">
-                            <div className="flex-1 flex flex-col justify-between py-1">
+                          <div key={menu.id} className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow flex items-stretch gap-4">
+                            <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
+                              <img
+                                src={menu.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60"}
+                                alt={menu.name}
+                                className="w-full h-full object-cover object-center"
+                              />
+                            </div>
+
+                            <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
                               <div>
                                 <h4 className="font-black text-gray-900 text-base">{menu.name}</h4>
                                 <p className="text-xs text-gray-400 font-bold mt-1.5 flex items-center gap-1">
                                   <Clock className="w-3.5 h-3.5 text-orange-500" /> Estimasi Masak: {menu.estimatedTime} menit
                                 </p>
+                                <p className="text-orange-600 font-black text-lg mt-2">Rp {menu.price.toLocaleString("id-ID")}</p>
                               </div>
-                              <p className="text-orange-600 font-black text-lg mt-3">Rp {menu.price.toLocaleString("id-ID")}</p>
-                            </div>
-                            
-                            <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl relative overflow-hidden shrink-0 group">
-                              <img src={menu.image || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60"} alt={menu.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-80" />
-                              
-                              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[85%]">
+
+                              <div className="mt-3 w-full max-w-[140px]">
                                 {!menu.isAvailable ? (
-                                  <div className="w-full bg-red-500 text-white text-[10px] font-black py-2 rounded-xl text-center shadow-lg">
+                                  <div className="w-full bg-red-500 text-white text-[10px] font-black py-2 rounded-xl text-center">
                                     Habis
                                   </div>
                                 ) : !cart[menu.id] ? (
-                                  <button 
+                                  <button
                                     onClick={() => updateCartQuantity(menu.id, 1)}
-                                    className="w-full bg-white text-gray-900 hover:text-orange-600 border border-gray-100 text-xs font-black py-2 rounded-xl shadow-lg transition-colors text-center cursor-pointer"
+                                    className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-black py-2 rounded-xl transition-colors text-center cursor-pointer"
                                   >
                                     Tambah
                                   </button>
                                 ) : (
-                                  <div className="flex items-center justify-between bg-orange-500 text-white text-sm font-black py-1.5 px-1 rounded-xl shadow-lg">
+                                  <div className="flex items-center justify-between bg-orange-500 text-white text-sm font-black py-1.5 px-1 rounded-xl">
                                     <button onClick={() => updateCartQuantity(menu.id, -1)} className="w-7 h-7 flex items-center justify-center hover:bg-white/20 rounded-lg cursor-pointer">-</button>
                                     <span>{cart[menu.id]}</span>
                                     <button onClick={() => updateCartQuantity(menu.id, 1)} className="w-7 h-7 flex items-center justify-center hover:bg-white/20 rounded-lg cursor-pointer">+</button>
