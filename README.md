@@ -66,7 +66,7 @@ Aplikasi live di URL Vercel. API di URL Railway + `/api`.
 | Role | Email | Password |
 |------|-------|----------|
 | Mahasiswa | student@binus.ac.id | password123 |
-| Tenant | tenant@binus.ac.id | password123 |
+| Tenant | tenant@tenant.binus.ac.id | password123 |
 
 ## Flow pesanan
 
