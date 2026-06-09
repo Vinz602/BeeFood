@@ -437,31 +437,6 @@ const TenantDashboard = () => {
 
         {/* Content View */}
         <div className="p-6 md:p-8 flex-1">
-          <div className="rounded-[2rem] border border-orange-100 bg-gradient-to-r from-orange-50 via-white to-orange-50 p-6 shadow-xl mb-8">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-3">
-                <p className="text-xs uppercase tracking-[0.35em] text-orange-600 font-black">Tenant Dashboard</p>
-                <h1 className="text-3xl font-black text-gray-900">Halo, {user?.tenant?.name || "Tenant BeeFood"}!</h1>
-                <p className="max-w-2xl text-sm text-gray-600">
-                  Kelola pesanan dan permintaan pelanggan dengan tampilan yang bersih, responsif, dan siap untuk lomba.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <div className="rounded-3xl bg-white p-4 shadow-sm border border-gray-100">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500 font-bold">Pesanan Aktif</p>
-                  <p className="mt-3 text-2xl font-black text-gray-900">{activeOrders.length}</p>
-                </div>
-                <div className="rounded-3xl bg-white p-4 shadow-sm border border-gray-100">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500 font-bold">Status Toko</p>
-                  <p className="mt-3 text-2xl font-black text-gray-900">{tenantIsOpen ? "Buka" : "Tutup"}</p>
-                </div>
-                <div className="rounded-3xl bg-white p-4 shadow-sm border border-gray-100">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-gray-500 font-bold">Ulasan</p>
-                  <p className="mt-3 text-2xl font-black text-gray-900">{feedback.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
           
           {/* TAB 1: ANTREAN PESANAN MAHASISWA */}
           {currentTab === "orders" && (

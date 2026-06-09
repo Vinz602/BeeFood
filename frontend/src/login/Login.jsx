@@ -50,15 +50,6 @@ const Login = () => {
     }
   }, [navigate]);
 
-  const isStudentEmail = (emailStr) => {
-    const normalized = emailStr.toLowerCase();
-    return normalized.endsWith("@binus.ac.id") && !normalized.endsWith("@tenant.binus.ac.id");
-  };
-
-  const isTenantEmail = (emailStr) => {
-    return emailStr.toLowerCase().endsWith("@tenant.binus.ac.id");
-  };
-
   const validateEmail = (emailStr) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(emailStr);
@@ -75,19 +66,6 @@ const Login = () => {
       return;
     }
 
-    // Role-based Email Domain Validation
-    if (role === "student") {
-      if (!isStudentEmail(email)) {
-        setErrorMsg("Sebagai Mahasiswa, Anda wajib menggunakan email @binus.ac.id dan bukan @tenant.binus.ac.id.");
-        return;
-      }
-    } else if (role === "tenant") {
-      if (!isTenantEmail(email)) {
-        setErrorMsg("Sebagai Tenant, Anda wajib menggunakan email @tenant.binus.ac.id.");
-        return;
-      }
-    }
-
     if (password.length < 6) {
       setErrorMsg("Password minimal harus 6 karakter.");
       return;
@@ -100,23 +78,13 @@ const Login = () => {
         // --- LOGIN FLOW ---
         const response = await axios.post(`${API_URL}/auth/login`, { email, password });
         
-        // Check if user role matches the selected form role
-        const loggedInUser = response.data.user;
-        const selectedRoleUpper = role === "student" ? "STUDENT" : "TENANT";
-        
-        if (loggedInUser.role !== selectedRoleUpper) {
-          setErrorMsg(`Akun Anda terdaftar sebagai ${loggedInUser.role === "STUDENT" ? "Mahasiswa" : "Tenant"}. Silakan pilih role Masuk yang sesuai.`);
-          setLoading(false);
-          return;
-        }
-
         setSuccessMsg("Berhasil masuk! Mengalihkan ke dasbor...");
         
         localStorage.setItem("beefood_token", response.data.token);
-        localStorage.setItem("beefood_user", JSON.stringify(loggedInUser));
+        localStorage.setItem("beefood_user", JSON.stringify(response.data.user));
         
         setTimeout(() => {
-          if (loggedInUser.role === "STUDENT") {
+          if (response.data.user.role === "STUDENT") {
             navigate("/student/dashboard");
           } else {
             navigate("/tenant/dashboard");
@@ -285,42 +253,40 @@ const Login = () => {
 
             <form onSubmit={handleAuth} className="space-y-5">
               
-              {/* Role Selection (Common for both Login and Register) */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">
-                  {activeTab === "login" ? "Masuk Sebagai" : "Daftar Sebagai"}
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setRole("student")}
-                    className={`p-3.5 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold text-sm cursor-pointer ${
-                      role === "student"
-                        ? "border-orange-500 bg-orange-50 text-orange-600 shadow-sm"
-                        : "border-gray-100 bg-white text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    <UtensilsCrossed className="w-4 h-4" />
-                    <span>Mahasiswa</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole("tenant")}
-                    className={`p-3.5 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold text-sm cursor-pointer ${
-                      role === "tenant"
-                        ? "border-orange-500 bg-orange-50 text-orange-600 shadow-sm"
-                        : "border-gray-100 bg-white text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Store className="w-4 h-4" />
-                    <span>Tenant</span>
-                  </button>
-                </div>
-              </div>
-
               {/* REGISTER ONLY FIELDS */}
               {activeTab === "register" && (
                 <>
+                  {/* Role Selection for Register */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Daftar Sebagai</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setRole("student")}
+                        className={`p-3.5 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold text-sm ${
+                          role === "student"
+                            ? "border-orange-500 bg-orange-50 text-orange-600"
+                            : "border-gray-100 bg-white text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        <UtensilsCrossed className="w-4 h-4" />
+                        <span>Mahasiswa</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRole("tenant")}
+                        className={`p-3.5 rounded-xl border-2 transition-all flex items-center justify-center gap-2 font-bold text-sm ${
+                          role === "tenant"
+                            ? "border-orange-500 bg-orange-50 text-orange-600"
+                            : "border-gray-100 bg-white text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        <Store className="w-4 h-4" />
+                        <span>Tenant</span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Full Name */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Nama Lengkap</label>
@@ -429,14 +395,11 @@ const Login = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder={role === "student" ? "Contoh: nama@binus.ac.id" : "Contoh: nama@tenant.binus.ac.id"}
+                    placeholder={activeTab === "login" ? "nama@binus.ac.id" : "Masukkan email Anda"}
                     className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 focus:bg-white focus:ring-4 focus:ring-orange-500/10 transition-all text-sm font-medium"
                     required
                   />
                 </div>
-                <p className="text-xs text-gray-400 mt-2">
-                  Harap gunakan email {role === "student" ? "@binus.ac.id" : "@tenant.binus.ac.id"} sesuai pilihan akun.
-                </p>
               </div>
 
               <div className="space-y-1.5">

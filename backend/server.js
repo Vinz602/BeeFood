@@ -61,14 +61,14 @@ const seedDatabase = async () => {
       
       const t1 = await prisma.tenant.create({
         data: {
-          name: "Ayam Penyet",
-          location: "Kantin Payung",
+          name: "Kantin Ayam Geprek SASC",
+          location: "Kantin SASC Lt. 1",
           isOpen: true,
           image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=60",
           menus: {
             create: [
               { name: "Ayam Geprek Crispy (Lv 1-5)", price: 18000, estimatedTime: 10, isAvailable: true, image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&auto=format&fit=crop&q=60" },
-              { name: "Ayam Bakar Madu", price: 20000, estimatedTime: 12, isAvailable: true, image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500&auto=format&fit=crop&q=60" }
+              { name: "Ayam Bakar Madu Binus", price: 20000, estimatedTime: 12, isAvailable: true, image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500&auto=format&fit=crop&q=60" }
             ]
           }
         }
@@ -77,7 +77,7 @@ const seedDatabase = async () => {
       const t2 = await prisma.tenant.create({
         data: {
           name: "Kedai Kopi Kampus & Boba",
-          location: "Kantin Basement",
+          location: "Kantin SASC Lt. 2",
           isOpen: true,
           image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=500&auto=format&fit=crop&q=60",
           menus: {
@@ -125,7 +125,7 @@ const seedDatabase = async () => {
       await prisma.user.create({
         data: {
           name: "SASC Geprek Owner",
-          email: "tenant@tenant.binus.ac.id",
+          email: "tenant@binus.ac.id",
           password: tenantPassword,
           role: "TENANT",
           phoneNumber: "081298765432",

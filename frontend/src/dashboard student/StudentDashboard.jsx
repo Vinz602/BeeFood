@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Wallet, ChevronLeft, ChevronRight, MapPin, Star, ShoppingBag, X, ChefHat, Clock, User, Phone, FileText, CheckCircle2, History, MessageSquare, LogOut, Upload, UserCheck, Sparkles, CreditCard, Zap, ArrowRight } from "lucide-react";
+import { Search, Wallet, ChevronLeft, MapPin, Star, ShoppingBag, X, ChefHat, Clock, User, Phone, FileText, CheckCircle2, History, MessageSquare, LogOut, Upload, UserCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { API_URL } from "../config";
@@ -60,19 +60,6 @@ const StudentDashboard = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successToast, setSuccessToast] = useState("");
-
-  // Carousel State
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isHoveringBanner, setIsHoveringBanner] = useState(false);
-
-  // Autoplay effect
-  useEffect(() => {
-    if (isHoveringBanner) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % 3);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [isHoveringBanner]);
 
   const categories = ["Semua", "Makanan Berat", "Minuman / Coffee", "Camilan", "Sehat"];
   
@@ -613,83 +600,37 @@ const StudentDashboard = () => {
                   className="space-y-8"
                 >
                   {/* PROMO HERO BANNER */}
-                  <div className="relative rounded-[2rem] overflow-hidden shadow-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-amber-50 mt-2">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(251,146,60,0.18),_transparent_30%)] pointer-events-none" />
-                    <div className="absolute -top-10 -left-16 w-72 h-72 bg-orange-200/40 rounded-full blur-3xl" />
-                    <div className="absolute -bottom-12 right-0 w-72 h-72 bg-amber-200/30 rounded-full blur-3xl" />
+                  <div className="relative rounded-3xl overflow-hidden shadow-sm border border-orange-100 bg-white mt-2">
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-white to-amber-50/30" />
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-orange-200/30 to-amber-200/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+                    
+                    <div className="absolute right-0 top-0 bottom-0 pointer-events-none w-[55%] h-full hidden sm:block">
+                      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10 w-1/3" />
+                      <img 
+                        src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1000&auto=format&fit=crop&q=80" 
+                        alt="Healthy Food" 
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </div>
 
-                    <div className="relative z-10 grid gap-8 lg:grid-cols-[1.5fr_1fr] items-center p-8 md:p-12">
-                      <div className="space-y-6">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-100/85 px-4 py-2 text-sm font-black text-orange-700 shadow-sm">
-                          <Sparkles className="w-5 h-5" />
-                          Dashboard Lomba: UI Juara
+                    <div className="relative z-10 p-8 md:p-12 flex justify-between items-center">
+                      <div className="max-w-md">
+                        <div className="inline-flex items-center gap-2 bg-orange-100/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-orange-200 shadow-sm mb-5">
+                          <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-orange-700">Pre-Order Cepat</span>
                         </div>
-
-                        <div className="max-w-xl">
-                          <p className="text-sm uppercase tracking-[0.35em] text-orange-500 font-black">Selamat Datang</p>
-                          <h1 className="mt-3 text-4xl md:text-5xl font-black leading-tight text-gray-900">
-                            Lebih Cepat, Lebih Rapi, Lebih Wow.
-                          </h1>
-                          <p className="mt-4 text-sm md:text-base text-gray-600 leading-relaxed max-w-xl">
-                            Temukan menu favorit, pesan lewat antarmuka yang bersih, dan nikmati proses belanja makanan kampus yang cantik, responsif, dan modern.
-                          </p>
-                        </div>
-
-                        <div className="grid gap-4 sm:grid-cols-2">
-                          <div className="rounded-3xl border border-orange-100 bg-white/90 p-5 shadow-sm">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-xs font-black uppercase text-orange-500 tracking-[0.25em]">Waktu Hemat</p>
-                              <span className="rounded-2xl bg-orange-50 px-3 py-1 text-orange-700 text-xs font-bold">+35%</span>
-                            </div>
-                            <p className="mt-3 text-sm text-gray-500 leading-relaxed">Kurangi antrean dengan sistem pre-order dan notifikasi proses.</p>
-                          </div>
-                          <div className="rounded-3xl border border-orange-100 bg-white/90 p-5 shadow-sm">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-xs font-black uppercase text-orange-500 tracking-[0.25em]">Domain Aman</p>
-                              <span className="text-orange-700 text-sm font-bold">Binus Only</span>
-                            </div>
-                            <p className="mt-3 text-sm text-gray-500 leading-relaxed">Validasi email otomatis untuk Mahasiswa dan Tenant.</p>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab("orders")}
-                            className="inline-flex items-center justify-center gap-2 rounded-3xl bg-orange-500 px-6 py-4 text-sm font-black uppercase tracking-[0.08em] text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600"
-                          >
-                            Lihat Menu Sekarang
-                            <ArrowRight className="w-4 h-4" />
-                          </button>
-
-                          <div className="rounded-3xl border border-gray-100 bg-white/95 p-4 shadow-sm flex items-center gap-3">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-600">
-                              <CreditCard className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-400 uppercase font-bold tracking-[0.18em]">Metode</p>
-                              <p className="mt-1 text-sm font-black text-gray-900">BEEPAY & QRIS</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="relative overflow-hidden rounded-[2rem] border border-orange-100 shadow-xl shadow-orange-100/20">
-                        <img
-                          src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&auto=format&fit=crop&q=80"
-                          alt="Hero Food Banner"
-                          className="h-full w-full object-cover object-center"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-orange-900/25 via-transparent to-transparent" />
-                        <div className="absolute bottom-6 left-6 rounded-3xl bg-white/95 p-5 shadow-2xl border border-white">
-                          <p className="text-xs text-orange-500 uppercase font-black tracking-[0.2em]">Top Review</p>
-                          <div className="mt-3 flex items-center gap-2">
-                            <div className="rounded-2xl bg-orange-50 px-3 py-1 text-orange-700 text-xs font-bold">Kantin Berbintang</div>
-                            <Star className="w-4 h-4 text-amber-500" />
-                            <span className="text-sm font-bold text-gray-900">4.9</span>
-                          </div>
-                          <p className="mt-2 text-sm text-gray-500">Menu cepat & enak pilihan kampus.</p>
-                        </div>
+                        
+                        <p className="text-orange-600 font-black text-sm md:text-base mb-2">
+                          Selamat datang, {user?.name?.split(" ")[0] || "Mahasiswa"}! 👋
+                        </p>
+                        <h2 className="text-3xl md:text-5xl font-black mb-4 leading-[1.1] tracking-tight text-gray-900">
+                          Pesan Sekarang,<br/>
+                          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Ambil Nanti!</span>
+                        </h2>
+                        
+                        <p className="text-gray-600 text-sm md:text-base font-medium mb-8 max-w-sm leading-relaxed">
+                          Estimasi pengerjaan terpantau real-time. Hindari antrean panjang dan nikmati waktu istirahatmu.
+                        </p>
                       </div>
                     </div>
                   </div>
