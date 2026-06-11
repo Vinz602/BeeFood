@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Store, ShoppingBag, Grid, LogOut, Menu, X, Check, ChefHat, Clock, Star, MessageSquare, Plus, CheckCircle2, User, Phone, MapPin, ChevronLeft } from "lucide-react";
+import { Store, ShoppingBag, Grid, LogOut, Menu, X, Check, ChefHat, Clock, Star, MessageSquare, Plus, CheckCircle2, User, Phone, MapPin, ChevronLeft, Pencil, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { compressImageFile } from "../utils/compressImage";
@@ -27,6 +27,18 @@ const TenantDashboard = () => {
   const [newMenuPrice, setNewMenuPrice] = useState("");
   const [newMenuTime, setNewMenuTime] = useState("");
   const [newMenuImage, setNewMenuImage] = useState("");
+
+  // Edit Menu States
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingMenu, setEditingMenu] = useState(null);
+  const [editMenuName, setEditMenuName] = useState("");
+  const [editMenuPrice, setEditMenuPrice] = useState("");
+  const [editMenuTime, setEditMenuTime] = useState("");
+  const [editMenuImage, setEditMenuImage] = useState("");
+
+  // Delete Menu States
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletingMenu, setDeletingMenu] = useState(null);
 
   // UI States
   const [loading, setLoading] = useState(true);
@@ -132,7 +144,7 @@ const TenantDashboard = () => {
       // Refresh orders
       const ordersRes = await axios.get(`${API_URL}/orders/tenant/${user.tenantId}`, getHeaders());
       setOrders(ordersRes.data);
-    } catch (err) {
+    } catch {
       alert("Gagal mengubah status pesanan.");
     } finally {
       setActionLoading(false);
@@ -147,7 +159,7 @@ const TenantDashboard = () => {
       // Update local state
       setMenus(menus.map(m => m.id === menuId ? { ...m, isAvailable: !m.isAvailable } : m));
       triggerToast("✅ Ketersediaan menu berhasil diupdate!");
-    } catch (err) {
+    } catch {
       alert("Gagal mengupdate ketersediaan menu.");
     }
   };
@@ -211,6 +223,85 @@ const TenantDashboard = () => {
       setNewMenuImage(compressed);
     } catch {
       alert("Gagal memproses foto menu. Coba file JPG/PNG lain.");
+    }
+  };
+
+  // Edit Menu Handlers
+  const handleOpenEditModal = (menu) => {
+    setEditingMenu(menu);
+    setEditMenuName(menu.name);
+    setEditMenuPrice(menu.price);
+    setEditMenuTime(menu.estimatedTime);
+    setEditMenuImage(menu.image || "");
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditMenuImageFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const compressed = await compressImageFile(file);
+      setEditMenuImage(compressed);
+    } catch {
+      alert("Gagal memproses foto menu. Coba file JPG/PNG lain.");
+    }
+  };
+
+  const handleEditMenuSubmit = async (e) => {
+    e.preventDefault();
+    const priceNum = parseFloat(editMenuPrice);
+    const timeNum = parseInt(editMenuTime, 10);
+    if (!editMenuName.trim()) {
+      alert("Nama hidangan wajib diisi.");
+      return;
+    }
+    if (Number.isNaN(priceNum) || priceNum <= 0) {
+      alert("Harga harus angka lebih dari 0.");
+      return;
+    }
+    if (Number.isNaN(timeNum) || timeNum <= 0) {
+      alert("Estimasi waktu masak harus angka lebih dari 0.");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const response = await axios.put(`${API_URL}/menus/${editingMenu.id}`, {
+        name: editMenuName.trim(),
+        price: priceNum,
+        estimatedTime: timeNum,
+        image: editMenuImage || undefined
+      }, getHeaders());
+
+      setMenus(menus.map(m => m.id === editingMenu.id ? response.data : m));
+      setIsEditModalOpen(false);
+      setEditingMenu(null);
+      triggerToast("Menu hidangan berhasil diperbarui!");
+    } catch (err) {
+      alert(getApiErrorMessage(err, "Gagal mengupdate menu."));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Delete Menu Handlers
+  const handleOpenDeleteModal = (menu) => {
+    setDeletingMenu(menu);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteMenuConfirm = async () => {
+    setActionLoading(true);
+    try {
+      await axios.delete(`${API_URL}/menus/${deletingMenu.id}`, getHeaders());
+      setMenus(menus.filter(m => m.id !== deletingMenu.id));
+      setIsDeleteModalOpen(false);
+      setDeletingMenu(null);
+      triggerToast("Menu hidangan berhasil dihapus!");
+    } catch (err) {
+      alert(getApiErrorMessage(err, "Gagal menghapus menu."));
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -664,6 +755,25 @@ const TenantDashboard = () => {
                             </span>
                           </div>
                         )}
+                        {/* Action Buttons Overlay (Edit & Delete) */}
+                        <div className="absolute top-3 right-3 flex items-center gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 z-10">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleOpenEditModal(s); }}
+                            title="Ubah Hidangan"
+                            className="p-2 bg-white/90 hover:bg-white text-gray-700 hover:text-orange-600 rounded-full shadow-md hover:scale-105 transition-all cursor-pointer"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleOpenDeleteModal(s); }}
+                            title="Hapus Hidangan"
+                            className="p-2 bg-white/90 hover:bg-white text-gray-700 hover:text-red-600 rounded-full shadow-md hover:scale-105 transition-all cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                       <div className="p-5 flex-1 flex flex-col justify-between">
                         <div>
@@ -1041,8 +1151,161 @@ const TenantDashboard = () => {
         </div>
       </main>
 
+      {/* EDIT MENU MODAL */}
+      <AnimatePresence>
+        {isEditModalOpen && editingMenu && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsEditModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.4 }}
+              className="bg-white rounded-3xl w-full max-w-md p-6 md:p-8 shadow-2xl relative z-10 border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden"
+            >
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(false)}
+                className="absolute top-6 right-6 p-2 bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
 
+              <div className="overflow-y-auto pr-1 space-y-5">
+                <h3 className="text-xl font-black text-gray-900 flex items-center gap-2">
+                  <Pencil className="w-5 h-5 text-orange-500" /> Ubah Menu Hidangan
+                </h3>
 
+                <form onSubmit={handleEditMenuSubmit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Nama Hidangan</label>
+                    <input
+                      type="text"
+                      value={editMenuName}
+                      onChange={(e) => setEditMenuName(e.target.value)}
+                      placeholder="Contoh: Ayam Bakar Spesial"
+                      className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 text-sm font-semibold"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Harga (Rp)</label>
+                    <input
+                      type="number"
+                      value={editMenuPrice}
+                      onChange={(e) => setEditMenuPrice(e.target.value)}
+                      placeholder="18000"
+                      className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 text-sm font-semibold"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Estimasi Masak (menit)</label>
+                    <input
+                      type="number"
+                      value={editMenuTime}
+                      onChange={(e) => setEditMenuTime(e.target.value)}
+                      placeholder="10"
+                      className="w-full p-3.5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-orange-500 text-sm font-semibold"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Foto Hidangan</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleEditMenuImageFileChange}
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-2xl text-xs font-semibold file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:font-black file:bg-orange-50 file:text-orange-700"
+                    />
+                    {editMenuImage && (
+                      <div className="relative h-36 w-full mt-2 rounded-2xl overflow-hidden border border-gray-100">
+                        <img src={editMenuImage} alt="Preview" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setEditMenuImage("")}
+                          className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black text-white rounded-full transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditModalOpen(false)}
+                      className="flex-1 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl text-sm font-bold transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={actionLoading}
+                      className="flex-1 py-3.5 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-sm font-black disabled:opacity-60 transition-colors shadow-lg hover:shadow-orange-500/20"
+                    >
+                      {actionLoading ? "Menyimpan..." : "Simpan Perubahan"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* DELETE MENU CONFIRMATION DIALOG */}
+      <AnimatePresence>
+        {isDeleteModalOpen && deletingMenu && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.4 }}
+              className="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl relative z-10 border border-gray-100 text-center"
+            >
+              <div className="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-black text-gray-900 mb-2">Hapus Menu Hidangan?</h3>
+              <p className="text-sm text-gray-500 mb-6 font-semibold">
+                Apakah Anda yakin ingin menghapus <strong>{deletingMenu.name}</strong>? Tindakan ini tidak dapat dibatalkan.
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsDeleteModalOpen(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-2xl text-xs font-bold transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteMenuConfirm}
+                  disabled={actionLoading}
+                  className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black transition-all shadow-lg hover:shadow-red-500/20"
+                >
+                  {actionLoading ? "Menghapus..." : "Ya, Hapus"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

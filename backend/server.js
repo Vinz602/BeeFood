@@ -499,6 +499,70 @@ app.post('/api/tenants/:tenantId/menus', authenticateToken, async (req, res) => 
   }
 });
 
+// 8b. Update Menu Item
+app.put('/api/menus/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { name, price, estimatedTime, image } = req.body;
+
+  if (!name || !price || !estimatedTime) {
+    return res.status(400).json({ error: "Parameter menu tidak lengkap" });
+  }
+
+  try {
+    const menu = await prisma.menu.findUnique({ where: { id: parseInt(id) } });
+    if (!menu) {
+      return res.status(404).json({ error: "Menu tidak ditemukan" });
+    }
+
+    // Check ownership
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (user.role !== 'TENANT' || user.tenantId !== menu.tenantId) {
+      return res.status(403).json({ error: "Akses ditolak" });
+    }
+
+    const updatedMenu = await prisma.menu.update({
+      where: { id: parseInt(id) },
+      data: {
+        name,
+        price: parseFloat(price),
+        estimatedTime: parseInt(estimatedTime),
+        image: image || menu.image
+      }
+    });
+
+    res.json(updatedMenu);
+  } catch (err) {
+    console.error("Gagal memperbarui menu:", err);
+    res.status(500).json({ error: "Gagal memperbarui menu" });
+  }
+});
+
+// 8c. Delete Menu Item
+app.delete('/api/menus/:id', authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const menu = await prisma.menu.findUnique({ where: { id: parseInt(id) } });
+    if (!menu) {
+      return res.status(404).json({ error: "Menu tidak ditemukan" });
+    }
+
+    // Check ownership
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (user.role !== 'TENANT' || user.tenantId !== menu.tenantId) {
+      return res.status(403).json({ error: "Akses ditolak" });
+    }
+
+    await prisma.menu.delete({
+      where: { id: parseInt(id) }
+    });
+
+    res.json({ message: "Menu berhasil dihapus" });
+  } catch (err) {
+    console.error("Gagal menghapus menu:", err);
+    res.status(500).json({ error: "Gagal menghapus menu" });
+  }
+});
+
 // 9. Create Pre-Order
 app.post('/api/orders', authenticateToken, async (req, res) => {
   const { tenantId, items, totalPrice, paymentMethod } = req.body;

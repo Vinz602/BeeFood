@@ -18,32 +18,6 @@ const StudentQrisCheckoutPage = () => {
     headers: { Authorization: `Bearer ${localStorage.getItem("beefood_token")}` },
   });
 
-  useEffect(() => {
-    if (!cart || !selectedTenant || !totalBelanja) {
-      navigate("/student/dashboard", { replace: true });
-    }
-  }, [cart, selectedTenant, totalBelanja, navigate]);
-
-  useEffect(() => {
-    if (!cart || !selectedTenant) return;
-
-    const interval = setInterval(() => {
-      setCountdown((c) => (c > 0 ? c - 1 : 0));
-    }, 1000);
-
-    const timer = setTimeout(() => {
-      if (!completedRef.current) {
-        completedRef.current = true;
-        submitOrder();
-      }
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timer);
-    };
-  }, []);
-
   const submitOrder = async () => {
     if (processing) return;
     setProcessing(true);
@@ -80,6 +54,32 @@ const StudentQrisCheckoutPage = () => {
       setProcessing(false);
     }
   };
+
+  useEffect(() => {
+    if (!cart || !selectedTenant || !totalBelanja) {
+      navigate("/student/dashboard", { replace: true });
+    }
+  }, [cart, selectedTenant, totalBelanja, navigate]);
+
+  useEffect(() => {
+    if (!cart || !selectedTenant) return;
+
+    const interval = setInterval(() => {
+      setCountdown((c) => (c > 0 ? c - 1 : 0));
+    }, 1000);
+
+    const timer = setTimeout(() => {
+      if (!completedRef.current) {
+        completedRef.current = true;
+        submitOrder();
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+    };
+  }, []);
 
   if (!cart || !selectedTenant) return null;
 
